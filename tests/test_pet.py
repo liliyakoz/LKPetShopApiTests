@@ -1,5 +1,4 @@
 import allure
-import jsonschema
 import requests
 import jsonschema
 from .schemas.pet_schema import PET_SCHEMA
@@ -144,7 +143,7 @@ class TestPet:
 
         with allure.step("Проверка статуса ответа после удаления"):
             get_response = requests.get(f"{BASE_URL}/pet/{pet_id}")
-        assert get_response.status_code == 404, "Питомец всё еще существует после удаления"
+            assert get_response.status_code == 404, "Питомец всё еще существует после удаления"
 
     @allure.title("Получение списка питомцев по статусу (позитив)")
     @pytest.mark.parametrize ("status, expected_status_code",
