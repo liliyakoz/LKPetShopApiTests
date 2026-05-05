@@ -132,17 +132,17 @@ class TestPet:
 
         with allure.step("Отправка запроса на создание питомца"):
             response = requests.post(url=f"{BASE_URL}/pet")
-            response_json = response.json()
 
 
         with allure.step("Отправка запроса на удаление информации о питомце"):
             response = requests.delete(url=f"{BASE_URL}/pet/{pet_id}")
 
 
-        with allure.step("Проверка статуса ответа и данных питомца"):
+        with allure.step("Проверка статуса ответа "):
             assert response.status_code == 200, "Код ответа не совпал с ожидаемым"
 
-        get_response = requests.get(f"{BASE_URL}/pet/{pet_id}")
+        with allure.step("Проверка статуса ответа после удаления"):
+            get_response = requests.get(f"{BASE_URL}/pet/{pet_id}")
         assert get_response.status_code == 404, "Питомец всё еще существует после удаления"
 
 
