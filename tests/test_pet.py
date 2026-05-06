@@ -1,8 +1,8 @@
 import allure
-import jsonschema
 import requests
 import jsonschema
 from .schemas.pet_schema import PET_SCHEMA
+import pytest
 
 BASE_URL = "http://5.181.109.28:9090/api/v3"
 
@@ -143,6 +143,34 @@ class TestPet:
 
         with allure.step("Проверка статуса ответа после удаления"):
             get_response = requests.get(f"{BASE_URL}/pet/{pet_id}")
-        assert get_response.status_code == 404, "Питомец всё еще существует после удаления"
+            assert get_response.status_code == 404, "Питомец всё еще существует после удаления"
+
+    @allure.title("Получение списка питомцев по статусу (позитив)")
+    @pytest.mark.parametrize ("status, expected_status_code",
+                              [("available", 200),
+                               ("pending", 200),
+                               ("sold", 200)
+                               ]
+                              )
+    def test_get_pets_by_status(self,status, expected_status_code):
+        with allure.step(f"Отправка запроса на получение питомцев по статусу {status}"):
+            response = requests.get(f"{BASE_URL}/pet/findByStatus", params={'status': status})
+
+        with allure.step("Проверка статуса ответа и формата данных"):
+            assert response.status_code == expected_status_code
+            assert isinstance(response.json(), dict)
 
 
+    @allure.title("Получение списка питомцев по статусу (негатив)")
+    @pytest.mark.parametrize("status, expected_status_code",
+                             [(" ", 400),
+                              ("fvsr", 400)
+                              ]
+                             )
+    def test_get_pets_by_status(self, status, expected_status_code):
+        with allure.step(f"Отправка запроса на получение питомцев по статусу {status}"):
+            response = requests.get(f"{BASE_URL}/pet/findByStatus", params={'status': status})
+
+        with allure.step("Проверка статуса ответа и формата данных"):
+            assert response.status_code == expected_status_code
+            assert isinstance(response.json(), dict)
