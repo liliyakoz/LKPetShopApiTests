@@ -2,7 +2,7 @@ import allure
 import requests
 import jsonschema
 import pytest
-from .schemas.store_schema import STORE_SCHEMA
+from .schemas.inventory_schema import INVENTORY_SCHEMA
 
 BASE_URL = "http://5.181.109.28:9090/api/v3"
 
@@ -20,6 +20,7 @@ class TestStore:
                 "complete": True
             }
             response = requests.post(url=f"{BASE_URL}/store/order", json=payload)
+            response_json = response.json()
 
         with allure.step("Проверка статуса ответа и данных"):
             assert response.status_code == 200, "Код ответа не совпал с ожидаемым"
@@ -28,21 +29,27 @@ class TestStore:
             assert response.json()["quantity"] == payload["quantity"], "quantity заказа не совпадает с ожидаемым"
             assert response.json()["status"] == payload["status"], "status заказа не совпадает с ожидаемым"
             assert response.json()["complete"] == payload["complete"], "complete заказа не совпадает с ожидаемым"
+            jsonschema.validate(response_json, INVENTORY_SCHEMA)
 
     @allure.title("Получение информации о заказе по ID")
-    def test_get_store_order_by_id(self):
+    def test_get_info_of_order_by_id(self, create_order):
+        with allure.step("Получение ID созданного заказа"):
+            order_id = create_order["id"]
+
         with allure.step("Отправка запроса на получение информации о заказе по ID"):
-            order_Id = 1
-            response = requests.get(url=f"{BASE_URL}/store/order/{order_Id}")
+            response = requests.get(f"{BASE_URL}/store/order/{order_id}")
 
         with allure.step("Проверка статуса ответа и данных заказа"):
             assert response.status_code == 200, "Код ответа не совпал с ожидаемым"
-            assert response.json()["id"] == order_Id, "ID заказа не совпал с ожидаемым"
+            assert response.json()["id"] == order_id, "ID заказа не совпал с ожидаемым"
 
     @allure.title("Удаление заказа по ID")
-    def test_delete_store_order_by_id(self):
+    def test_delete_order_by_id(self, create_order):
+        with allure.step("Получение ID созданного заказа"):
+            order_id = create_order["id"]
+
         with allure.step("Отправка запроса на удаление заказа по ID"):
-            response = requests.delete(url=f"{BASE_URL}/store/order/1")
+            response = requests.delete(f"{BASE_URL}/store/order/{order_id}")
 
         with allure.step("Проверка статуса ответа"):
             assert response.status_code == 200, "Код ответа не совпал с ожидаемым"
@@ -70,4 +77,4 @@ class TestStore:
 
         with allure.step("Проверка статуса ответа и валидация Json-схемы"):
             assert response.status_code == 200, "Код ответа не совпал с ожидаемым"
-            jsonschema.validate(response_json, STORE_SCHEMA)
+            jsonschema.validate(response_json, INVENTORY_SCHEMA)
