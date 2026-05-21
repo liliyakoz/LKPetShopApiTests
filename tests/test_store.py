@@ -2,7 +2,7 @@ import allure
 import requests
 import jsonschema
 import pytest
-from .schemas.inventory_schema import INVENTORY_SCHEMA
+from .schemas.store_schema import INVENTORY_SCHEMA, ORDER_SCHEMA
 
 BASE_URL = "http://5.181.109.28:9090/api/v3"
 
@@ -29,7 +29,7 @@ class TestStore:
             assert response.json()["quantity"] == payload["quantity"], "quantity заказа не совпадает с ожидаемым"
             assert response.json()["status"] == payload["status"], "status заказа не совпадает с ожидаемым"
             assert response.json()["complete"] == payload["complete"], "complete заказа не совпадает с ожидаемым"
-            jsonschema.validate(response_json, INVENTORY_SCHEMA)
+            jsonschema.validate(response_json, ORDER_SCHEMA)
 
     @allure.title("Получение информации о заказе по ID")
     def test_get_info_of_order_by_id(self, create_order):
@@ -70,11 +70,9 @@ class TestStore:
 
     @allure.title("Получение инвентаря магазина")
     def test_get_store_inventory(self):
-        with allure.step("Отправка запроса на получение инвентаря магазина"):
+        with allure.step("Отправка запроса на получение инвенторя"):
             response = requests.get(url=f"{BASE_URL}/store/inventory")
-            response_json = response.json()
 
-
-        with allure.step("Проверка статуса ответа и валидация Json-схемы"):
+        with allure.step("Проверка статуса ответа и валидация JSON-схемы"):
             assert response.status_code == 200, "Код ответа не совпал с ожидаемым"
-            jsonschema.validate(response_json, INVENTORY_SCHEMA)
+            jsonschema.validate(response.json(), INVENTORY_SCHEMA)
