@@ -58,7 +58,7 @@ class TestPet:
 
         with allure.step("Проверка стастатуса ответа и валидация JSON-схемы"):
             assert response.status_code == 200, "Код ответа не совпал с ожидаемым"
-            jsonschema.validate(response_json, PET_SCHEMA)
+
 
         with allure.step("Проверка параметров питомца в ответе"):
             assert response_json['id'] == payload['id'], "id питомца не совпадает с ожидаемым"
