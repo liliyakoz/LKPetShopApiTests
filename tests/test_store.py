@@ -55,7 +55,7 @@ class TestStore:
             assert response.status_code == 200, "Код ответа не совпал с ожидаемым"
 
         with allure.step("Отправка запроса на получение информации о питомце по ID"):
-            response = requests.get(url=f"{BASE_URL}/store/order/1")
+            response = requests.delete(f"{BASE_URL}/store/order/{order_id}")
 
         with allure.step("Проверка статуса ответа"):
             assert response.status_code == 404, "Код ответа не совпал с ожидаемым"
